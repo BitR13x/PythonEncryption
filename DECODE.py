@@ -30,14 +30,28 @@ def decrypt_func(ENCRYPTED, password):
 if __name__ == "__main__":
     if sys.argv[1]:
         passwd = getpass("Password: ")
-
-        filename = sys.argv[1]
-        with open(filename, "r") as temp:
+        
+        file_path = sys.argv[1]
+        with open(file_path, "r") as temp:
             source = temp.read()
-        system(f"rm {filename}")
 
-        filename = filename.split("_e")[0] + filename.split("_e")[1]
-        with open(filename, "w") as de_file:
-            de_file.write(decrypt_func(source, passwd).decode("utf8"))
+        if "/" in file_path:
+            filename = file_path.split("/").pop()
+            filename = filename.split("_e")[0] + filename.split("_e")[1]
+            file_location = file_path.split("/")
+            file_location[-1] = ""
+            file_location = "/".join(file_location) + filename
+        else:
+            file_location = file_path.split("_e")[0] + file_path.split("_e")[1]
+            
+        with open(file_location, "w") as de_file:
+            if len(decrypt_func(source, passwd).decode("utf8")) == 0:
+                print("Wrong password")
+            else:
+                print("\nExtracting[*]")
+                de_file.write(decrypt_func(source, passwd).decode("utf8"))
+                system(f"rm {sys.argv[1]}")
+                print("Extracted in %s" % (file_location))
     else:
+        print("Usage: " + str(__file__) + " <file/file_path>")
         print("File not specified")

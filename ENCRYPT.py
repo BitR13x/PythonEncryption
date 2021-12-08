@@ -29,24 +29,42 @@ def encrypt_func(plain_text, password):
 
 
 if __name__ == "__main__":
+    #USAGE FOR FUNCTIONS:
     #passwd = encrypt_func("hello", "anon")
     #print("PASSWORD:",passwd)
     #print("DECRYPTED:",decrypt_func(passwd, "anon").decode("utf8"))
 
     # encrypt
     if sys.argv[1]:
-        filename = sys.argv[1]
+        file_path = sys.argv[1]
         passwd = getpass("Password: ")
-        with open( str(filename), "r") as temp:
+        passwd2 = getpass("Repeat password: ")
+        if passwd != passwd2:
+            print("Passwords not match")
+            exit()
+
+        with open( str(file_path), "r") as temp:
             source = temp.read()
-        system(f"rm {filename}")
 
-        try:
+        if "/" in file_path:
+            filename = file_path.split("/").pop()
             filename = filename.split(".")[0] + "_e." + filename.split(".")[1]
-        except IndexError:
-            filename = filename.split(".")[0] + "_e"
-
-        with open(filename, "w") as en_file:
+            file_location = file_path.split("/")
+            file_location[-1] = ""
+            file_location = "/".join(file_location) + filename
+        else:
+            try:
+                file_location = file_path.split(".")[0] + "_e." + file_path.split(".")[1]
+            except IndexError:
+                file_location = file_path.split(".")[0] + "_e"
+                
+        # filename = /path/path/gweagw.py
+        with open(file_location, "w") as en_file:
             en_file.write( encrypt_func(source, passwd ).decode("utf8") )
+
+        print("Saved as %s" % (file_location))
+        system(f"rm {sys.argv[1]}")
+
     else:
+        print("Usage: " + str(__file__) + " <file/file_path>")
         print("File not specified")
